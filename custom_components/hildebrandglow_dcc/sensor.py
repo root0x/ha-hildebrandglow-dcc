@@ -6,6 +6,8 @@ from datetime import datetime, time, timedelta
 import logging
 import itertools
 import statistics
+
+from pytz import timezone
 import requests
 
 from homeassistant.components.sensor import (
@@ -41,6 +43,9 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=5)
+
+# Replace 'Europe/London' with your actual timezone
+tz = timezone("Europe/London")
 
 
 async def async_setup_entry(
@@ -157,9 +162,9 @@ async def should_update() -> bool:
 async def daily_data(hass: HomeAssistant, resource, t_from: datetime = None, precision: str = "PT30M") -> (float, str):
     """Get daily usage from the API."""
     # Always pull down the last 6 hours of readings
-    now = datetime.now()
+    now = datetime.now(tz)
     # Round to the day to set time to 00:00:00
-    t_from = await hass.async_add_executor_job(resource.round, datetime.now() - timedelta(hours=12), "PT1M")
+    t_from = await hass.async_add_executor_job(resource.round, datetime.now(tz) - timedelta(hours=12), "PT1M")
     # Round to the minute subtract 1 hour to account for non complete hours
     t_to = await hass.async_add_executor_job(resource.round, now, "PT1M")#await hass.async_add_executor_job(resource.round, (now - timedelta(hours=1)).replace(minute= 59, second=59), "PT1M")
     # Tell Hildebrand to pull latest DCC data
