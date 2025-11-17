@@ -34,6 +34,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dtutil
+from homeassistant.util.unit_conversion import EnergyConverter
 
 from homeassistant_historical_sensor import (
     HistoricalSensor,
@@ -246,6 +247,7 @@ class HistoricalSensorMixin(PollUpdateMixin, HistoricalSensor, SensorEntity):
         meta = super().get_statistic_metadata()
         meta["has_sum"] = True
         meta["mean_type"] = StatisticMeanType.ARITHMETIC
+        meta["unit_class"] = None
 
         return meta
 
@@ -356,6 +358,7 @@ class Usage(PollUpdateMixin, HistoricalSensor, SensorEntity):
         meta = super().get_statistic_metadata()
         meta["has_sum"] = True
         meta["mean_type"] = StatisticMeanType.NONE
+        meta["unit_class"] = EnergyConverter.UNIT_CLASS
 
         return meta
 
