@@ -24,12 +24,17 @@ from homeassistant.helpers.update_coordinator import (
 
 from homeassistant.components import recorder
 from homeassistant.components.recorder import statistics
-from homeassistant.components.recorder.models import StatisticData, StatisticMetaData
+from homeassistant.components.recorder.models import (
+    StatisticData,
+    StatisticMeanType,
+    StatisticMetaData,
+)
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dtutil
+from homeassistant.util.unit_conversion import EnergyConverter
 
 from homeassistant_historical_sensor import (
     HistoricalSensor,
@@ -241,7 +246,8 @@ class HistoricalSensorMixin(PollUpdateMixin, HistoricalSensor, SensorEntity):
     def get_statistic_metadata(self) -> StatisticMetaData:
         meta = super().get_statistic_metadata()
         meta["has_sum"] = True
-        meta["has_mean"] = True
+        meta["mean_type"] = StatisticMeanType.ARITHMETIC
+        meta["unit_class"] = None
 
         return meta
 
@@ -351,6 +357,8 @@ class Usage(PollUpdateMixin, HistoricalSensor, SensorEntity):
     def get_statistic_metadata(self) -> StatisticMetaData:
         meta = super().get_statistic_metadata()
         meta["has_sum"] = True
+        meta["mean_type"] = StatisticMeanType.NONE
+        meta["unit_class"] = EnergyConverter.UNIT_CLASS
 
         return meta
 
