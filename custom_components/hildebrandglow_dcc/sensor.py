@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import itertools
 import logging
 import statistics
+from zoneinfo import ZoneInfo
 
 import requests
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
@@ -28,6 +29,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(minutes=5)
+UTC = ZoneInfo("UTC")
 
 
 async def async_setup_entry(
@@ -234,7 +236,7 @@ class HistoricalSensorMixin(HistoricalSensor, SensorEntity):
         accumulated = latest["sum"] if latest else 0
 
         def hour_block_for_hist_state(hist_state: HistoricalState) -> datetime:
-            return datetime.fromtimestamp(hist_state.timestamp).replace(
+            return datetime.fromtimestamp(hist_state.timestamp, tz=UTC).replace(
                 minute=0, second=0, microsecond=0
             )
 
@@ -344,7 +346,7 @@ class Usage(HistoricalSensor, SensorEntity):
         accumulated = latest["sum"] if latest else 0
 
         def hour_block_for_hist_state(hist_state: HistoricalState) -> datetime:
-            return datetime.fromtimestamp(hist_state.timestamp).replace(
+            return datetime.fromtimestamp(hist_state.timestamp, tz=UTC).replace(
                 minute=0, second=0, microsecond=0
             )
 
